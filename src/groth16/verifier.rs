@@ -54,3 +54,18 @@ pub fn verify_proof<'a, E: Engine>(
     .unwrap()
         == pvk.alpha_g1_beta_g2)
 }
+
+pub fn verify_batch<'a, E: Engine>(
+    vk: &VerifyingKey<E>,
+    proofs: &Vec<Proof<E>>,
+    public_inputs: &Vec<Vec<E::Fr>>,
+) -> Result<bool, SynthesisError> {
+    let pvk = prepare_verifying_key(vk);
+    for (p, pi) in proofs.iter().zip(public_inputs.iter()) {
+        if !verify_proof(&pvk, p, pi).unwrap() {
+            return Ok(false);
+        }
+    }
+
+    Ok(true)
+}

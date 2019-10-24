@@ -475,37 +475,37 @@ mod test_with_bls12_381 {
     use pairing::bls12_381::{Bls12, Fr};
     use rand::thread_rng;
 
+    struct MySillyCircuit<E: Engine> {
+        a: Option<E::Fr>,
+        b: Option<E::Fr>,
+    }
+
+    impl<E: Engine> Circuit<E> for MySillyCircuit<E> {
+        fn synthesize<CS: ConstraintSystem<E>>(
+            self,
+            cs: &mut CS,
+        ) -> Result<(), SynthesisError> {
+            let a = cs.alloc(|| "a", || self.a.ok_or(SynthesisError::AssignmentMissing))?;
+            let b = cs.alloc(|| "b", || self.b.ok_or(SynthesisError::AssignmentMissing))?;
+            let c = cs.alloc_input(
+                || "c",
+                || {
+                    let mut a = self.a.ok_or(SynthesisError::AssignmentMissing)?;
+                    let b = self.b.ok_or(SynthesisError::AssignmentMissing)?;
+
+                    a.mul_assign(&b);
+                    Ok(a)
+                },
+            )?;
+
+            cs.enforce(|| "a*b=c", |lc| lc + a, |lc| lc + b, |lc| lc + c);
+
+            Ok(())
+        }
+    }
+
     #[test]
     fn serialization() {
-        struct MySillyCircuit<E: Engine> {
-            a: Option<E::Fr>,
-            b: Option<E::Fr>,
-        }
-
-        impl<E: Engine> Circuit<E> for MySillyCircuit<E> {
-            fn synthesize<CS: ConstraintSystem<E>>(
-                self,
-                cs: &mut CS,
-            ) -> Result<(), SynthesisError> {
-                let a = cs.alloc(|| "a", || self.a.ok_or(SynthesisError::AssignmentMissing))?;
-                let b = cs.alloc(|| "b", || self.b.ok_or(SynthesisError::AssignmentMissing))?;
-                let c = cs.alloc_input(
-                    || "c",
-                    || {
-                        let mut a = self.a.ok_or(SynthesisError::AssignmentMissing)?;
-                        let b = self.b.ok_or(SynthesisError::AssignmentMissing)?;
-
-                        a.mul_assign(&b);
-                        Ok(a)
-                    },
-                )?;
-
-                cs.enforce(|| "a*b=c", |lc| lc + a, |lc| lc + b, |lc| lc + c);
-
-                Ok(())
-            }
-        }
-
         let rng = &mut thread_rng();
 
         let params =
@@ -554,5 +554,41 @@ mod test_with_bls12_381 {
             assert!(verify_proof(&pvk, &proof, &[c]).unwrap());
             assert!(!verify_proof(&pvk, &proof, &[a]).unwrap());
         }
+    }
+
+    #[test]
+    fn batch_verification() {
+        let rng = &mut thread_rng();
+
+        let params =
+            generate_random_parameters::<Bls12, _, _>(MySillyCircuit { a: None, b: None }, rng)
+                .unwrap();
+
+        let pvk = prepare_verifying_key::<Bls12>(&params.vk);
+
+        let mut proofs = vec![];
+        let mut public_inputs = vec![];
+        for _ in 0..10 {
+            let a = Fr::random(rng);
+            let b = Fr::random(rng);
+            let mut c = a;
+            c.mul_assign(&b);
+
+            let proof = create_random_proof(
+                MySillyCircuit {
+                    a: Some(a),
+                    b: Some(b),
+                },
+                &params,
+                rng,
+            ).unwrap();
+
+            proofs.push(proof);
+            public_inputs.push(vec![c]);
+        }
+
+        assert!(verify_batch(&params.vk, &proofs, &public_inputs).unwrap());
+        public_inputs[0] = vec![Fr::zero()];
+        assert!(!verify_batch(&params.vk, &proofs, &public_inputs).unwrap());
     }
 }
