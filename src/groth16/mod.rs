@@ -587,8 +587,8 @@ mod test_with_bls12_381 {
             public_inputs.push(vec![c]);
         }
 
-        assert!(verify_batch(&params.vk, &proofs, &public_inputs).unwrap());
+        assert!(verify_batch(&params.vk, &proofs, &public_inputs, rng).unwrap());
         public_inputs[0] = vec![Fr::zero()];
-        assert!(!verify_batch(&params.vk, &proofs, &public_inputs).unwrap());
+        assert!(!verify_batch(&params.vk, &proofs, &public_inputs, rng).unwrap());
     }
 }
