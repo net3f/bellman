@@ -28,6 +28,7 @@ hex-literal = "0.2"
 rand = "0.7"
 rand_xorshift = "0.2"
 sha2 = "0.8"
+csv = "1"
 
 [features]
 groth16 = ["pairing"]
@@ -41,3 +42,8 @@ required-features = ["groth16"]
 
 [badges]
 maintenance = { status = "actively-developed" }
+
+[[example]]
+name = "groth16"
+path = "examples/snark-scalability/groth16.rs"
+required-features = ["groth16"]
