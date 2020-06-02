@@ -1,29 +1,29 @@
-//#![deny(
-//    unused_import_braces,
-//    unused_qualifications,
-//    trivial_casts,
-//    trivial_numeric_casts
-//)]
-//#![deny(unused_qualifications, variant_size_differences, stable_features)]
-//#![deny(
-//    non_shorthand_field_patterns,
-//    unused_attributes,
-//    unused_imports,
-//    unused_extern_crates
-//)]
-//#![deny(
-//    renamed_and_removed_lints,
-//    stable_features,
-//    unused_allocation,
-//    unused_comparisons
-//)]
-//#![deny(
-//    unused_must_use,
-//    unused_mut,
-//    unused_unsafe,
-//    private_in_public,
-//    unsafe_code
-//)]
+#![deny(
+    unused_import_braces,
+    unused_qualifications,
+    trivial_casts,
+    trivial_numeric_casts
+)]
+#![deny(unused_qualifications, variant_size_differences, stable_features)]
+#![deny(
+    non_shorthand_field_patterns,
+    unused_attributes,
+    unused_imports,
+    unused_extern_crates
+)]
+#![deny(
+    renamed_and_removed_lints,
+    stable_features,
+    unused_allocation,
+    unused_comparisons
+)]
+#![deny(
+    unused_must_use,
+    unused_mut,
+    unused_unsafe,
+    private_in_public,
+    unsafe_code
+)]
 
 use csv;
 
@@ -37,18 +37,14 @@ use std::{
 };
 
 // Bring in some tools for using pairing-friendly curves
-use ff::{Field, ScalarEngine};
-use pairing::Engine;
+use ff::Field;
 
 // We're going to use the BLS12-381 pairing-friendly elliptic curve.
 use pairing::bls12_381::{Bls12, Fr};
 
-// We'll use these interfaces to construct our circuit.
-use bellman::{Circuit, ConstraintSystem, SynthesisError};
-
 // We're going to use the Groth16 proving system.
 use bellman::groth16::{
-    create_random_proof, generate_random_parameters, prepare_verifying_key, verify_proof, Proof,
+    create_random_proof, generate_random_parameters, prepare_verifying_key, verify_proof
 };
 
 use std::{env, fs::OpenOptions, path::PathBuf, process};
