@@ -6,27 +6,29 @@ homepage = "https://github.com/ebfull/bellman"
 license = "MIT/Apache-2.0"
 name = "bellman"
 repository = "https://github.com/ebfull/bellman"
-version = "0.6.0"
+version = "0.8.0"
 edition = "2018"
 
 [dependencies]
-bit-vec = "0.4.4"
+bitvec = "0.18"
 blake2s_simd = "0.5"
-ff = { version = "0.6" }
+ff = "0.8"
 futures = "0.1"
 futures-cpupool = { version = "0.1", optional = true }
-group = { version = "0.6" }
+group = "0.8"
 num_cpus = { version = "1", optional = true }
 crossbeam = { version = "0.7", optional = true }
-pairing = { version = "0.16", optional = true }
+pairing = { version = "0.18", optional = true }
 rand_core = "0.5"
 byteorder = "1"
+subtle = "2.2.1"
 
 [dev-dependencies]
+bls12_381 = "0.3"
 hex-literal = "0.2"
 rand = "0.7"
 rand_xorshift = "0.2"
-sha2 = "0.8"
+sha2 = "0.9"
 
 [features]
 groth16 = ["pairing"]
