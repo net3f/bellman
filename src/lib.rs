@@ -209,7 +209,7 @@ impl<Scalar: PrimeField> Add<(Scalar, Variable)> for LinearCombination<Scalar> {
     fn add(mut self, (coeff, var): (Scalar, Variable)) -> LinearCombination<Scalar> {
         self.0
             .entry(var)
-            .or_insert(E::Fr::zero())
+            .or_insert(Scalar::zero())
             .add_assign(&coeff);
 
         self
@@ -248,7 +248,7 @@ impl<'a, Scalar: PrimeField> Add<&'a LinearCombination<Scalar>> for LinearCombin
         for (var, val) in &other.0 {
             self.0
                 .entry(*var)
-                .or_insert(E::Fr::zero())
+                .or_insert(Scalar::zero())
                 .add_assign(val);
         }
 
@@ -584,17 +584,18 @@ mod tests {
     use super::*;
     #[test]
     fn test_add_simplify() {
-        use pairing::bls12_381::Bls12;
+        use bls12_381::Scalar;
+        use std::ops::AddAssign;
 
         let n = 5;
 
-        let mut lc = LinearCombination::<Bls12>::zero();
+        let mut lc = LinearCombination::<Scalar>::zero();
 
-        let mut expected_sums = vec![<Bls12 as ScalarEngine>::Fr::zero(); n];
+        let mut expected_sums = vec![Scalar::zero(); n];
         let mut total_additions = 0;
         for i in 0..n {
             for _ in 0..i + 1 {
-                let coeff = <Bls12 as ScalarEngine>::Fr::one();
+                let coeff = Scalar::one();
                 lc = lc + (coeff, Variable::new_unchecked(Index::Aux(i)));
                 let mut tmp = expected_sums[i];
                 tmp.add_assign(&coeff);

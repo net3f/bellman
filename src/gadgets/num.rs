@@ -427,7 +427,7 @@ impl<Scalar: PrimeField> Num<Scalar> {
         Num { value, lc }
     }
 
-    pub fn scale(mut self, scalar: E::Fr) -> Self {
+    pub fn scale(mut self, scalar: Scalar) -> Self {
         for (_variable, fr) in self.lc.0.iter_mut() {
             fr.mul_assign(&scalar);
         }
@@ -629,6 +629,7 @@ mod test {
     #[test]
     fn test_num_scale() {
         use crate::{Index, LinearCombination, Variable};
+        use std::ops::{AddAssign, MulAssign};
 
         let mut rng = XorShiftRng::from_seed([
             0x59, 0x62, 0xbe, 0x3d, 0x76, 0x3d, 0x31, 0x8d, 0x17, 0xdb, 0x37, 0x32, 0x54, 0x06,
@@ -637,12 +638,12 @@ mod test {
 
         let n = 5;
 
-        let mut lc = LinearCombination::<Bls12>::zero();
+        let mut lc = LinearCombination::<Scalar>::zero();
 
-        let mut expected_sums = vec![Fr::zero(); n];
-        let mut value = Fr::zero();
+        let mut expected_sums = vec![Scalar::zero(); n];
+        let mut value = Scalar::zero();
         for i in 0..n {
-            let coeff = Fr::random(&mut rng);
+            let coeff = Scalar::random(&mut rng);
             lc = lc + (coeff, Variable::new_unchecked(Index::Aux(i)));
             let mut tmp = expected_sums[i];
             tmp.add_assign(&coeff);
@@ -651,7 +652,7 @@ mod test {
             value.add_assign(&coeff);
         }
 
-        let scalar = Fr::random(&mut rng);
+        let scalar = Scalar::random(&mut rng);
         let num = Num {
             value: Some(value),
             lc: lc.clone(),

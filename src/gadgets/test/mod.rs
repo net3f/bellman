@@ -63,7 +63,7 @@ impl Ord for OrderedVariable {
     }
 }
 
-fn proc_lc<Scalar: PrimeField>(terms: &LinearCombination<Scalar>) -> BTreeMap<OrderedVariable, E::Fr> {
+fn proc_lc<Scalar: PrimeField>(terms: &LinearCombination<Scalar>) -> BTreeMap<OrderedVariable, Scalar> {
     let mut map = BTreeMap::new();
     for (&var, &coeff) in terms.iter() {
         map.entry(OrderedVariable(var))
